@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String    @id @default(uuid())
+  username       String
+  email          String    @unique
+  password       String
+  role           Role      @default(VERIFIER)
+  isActive       Boolean   @default(true)
+  fullName       String?
+  profilePicture String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  loans          Loan[]
+  loanSubs       LoanSub[]
+}
+
+model Loan {
+  id                 String     @id @default(uuid())
+  amount             Decimal
+  purpose            String
+  status             LoanStatus @default(PENDING)
+  verifiedBy         String?
+  approvedBy         String?
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+  userId             String
+  creditCheckConsent Boolean    @default(false)
+  employerAddress    String?
+  employmentStatus   String?
+  termMonths         Int?
+  user               User       @relation(fields: [userId], references: [id])
+}
+
+model LoanSub {
+  id               String    @id
+  amount           Decimal   @db.Decimal(10, 2)
+  term             Int
+  purpose          String
+  employmentStatus String
+  employerName     String
+  employerAddress  String
+  status           String    @default("PENDING")
+  verifierComment  String?
+  adminComment     String?
+  verifiedAt       DateTime?
+  approvedAt       DateTime?
+  rejectedAt       DateTime?
+  verifierId       String?
+  adminId          String?
+  userId           String
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @default(now())
+  User             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum Role {
+  VERIFIER
+  ADMIN
+}
+
+enum LoanStatus {
+  PENDING
+  VERIFIED
+  APPROVED
+  REJECTED
+}

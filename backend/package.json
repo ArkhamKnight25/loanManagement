@@ -1,0 +1,7 @@
+{
+  "scripts": {
+    "migrate": "prisma migrate dev",
+    "migrate:deploy": "prisma migrate deploy",
+    "db:seed": "prisma db seed"
+  }
+} 
